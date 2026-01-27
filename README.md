@@ -10,7 +10,7 @@ ProjectMentor helps **students, interns, and newly joined developers** quickly u
 ## 🧠 Problem Statement
 Understanding an existing project is one of the hardest challenges for:
 
-- 🎓 **Students** working on academic or open-source projects  
+- 🎓 **Students** working on academic, hackathons or open-source projects  
 - 🧑‍💻 **Interns** onboarding into unfamiliar codebases  
 - 👩‍💼 **New employees** joining fast-moving engineering teams  
 
@@ -77,7 +77,7 @@ It allows users to:
 
 ---
 
-## 🖥️ Demo Flow (Hackathon MVP)
+## 🖥️ Flow
 1. Open **ProjectMentor**  
 2. Click **Connect Repo / Upload ZIP**  
 3. Sign in (**Mocked**: Google / GitHub / Email)  
@@ -90,7 +90,7 @@ It allows users to:
 
 ---
 
-## 🛠 Tech Stack (Current MVP)
+## 🛠 Tech Stack (Current)
 
 **Frontend**  
 - ⚛ React  
