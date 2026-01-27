@@ -155,6 +155,3 @@ This project is currently in **MVP / hackathon stage**.
 Contributions, ideas, and feedback are **welcome**!  
 
 ---
-
-## 📄 License
-[MIT License](LICENSE)
