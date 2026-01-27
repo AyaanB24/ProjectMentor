@@ -2,15 +2,16 @@ import { useState } from "react";
 import { FileInsight, CodeSnippet } from "@/data/learningContent";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Lightbulb, 
-  Target, 
-  Code2, 
+import {
+  Lightbulb,
+  Target,
+  Code2,
   ChevronRight,
   AlertTriangle,
   CheckCircle2,
   ListTodo,
-  Info
+  Info,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,7 @@ export function TabbedInsightPanel({
 
   if (!insight) {
     return (
-      <div className="w-80 border-l border-border bg-sidebar flex flex-col">
+      <div className="w-72 border-l border-border bg-sidebar flex flex-col">
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center">
             <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/50" />
@@ -65,7 +66,7 @@ export function TabbedInsightPanel({
   }
 
   return (
-    <div className="w-80 border-l border-border bg-sidebar flex flex-col overflow-hidden">
+    <div className="w-72 border-l border-border bg-sidebar flex flex-col overflow-hidden">
       {/* Tabs */}
       <div className="flex border-b border-border bg-muted/30">
         {tabs.map((tab) => (
@@ -73,23 +74,23 @@ export function TabbedInsightPanel({
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "flex-1 px-3 py-2.5 text-xs font-medium transition-colors relative",
+              "flex-1 px-4 py-3 text-sm font-semibold transition-all relative",
               activeTab === tab.id
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
+                ? "text-primary bg-primary/5 shadow-[inset_0_-2px_0_0_currentColor]"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             {tab.label}
             {tab.id === "issues" && issues.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-1.5 h-4 px-1 text-[10px] bg-amber-500/20 text-amber-400"
+              <Badge
+                variant="secondary"
+                className="ml-1.5 h-4 px-1.5 text-[10px] bg-amber-500/20 text-amber-400 border-amber-500/30"
               >
                 {issues.length}
               </Badge>
             )}
             {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary animate-in fade-in slide-in-from-bottom-1 duration-200" />
             )}
           </button>
         ))}
@@ -139,36 +140,36 @@ export function TabbedInsightPanel({
 
 function WhyTab({ insight }: { insight: FileInsight }) {
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-3 space-y-3">
       {/* Purpose */}
-      <div className="space-y-2">
+      <div className="p-3 rounded-lg bg-muted/30 space-y-1.5 border border-border/50">
         <div className="flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-amber-400" />
-          <h4 className="font-medium text-sm">Purpose</h4>
+          <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+          <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">Purpose</h4>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+        <p className="text-sm text-foreground/90 leading-normal pl-5">
           {insight.whyExists}
         </p>
       </div>
 
       {/* Problem it Solves */}
-      <div className="space-y-2">
+      <div className="p-3 rounded-lg bg-muted/30 space-y-1.5 border border-border/50">
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-green-400" />
-          <h4 className="font-medium text-sm">Problem it Solves</h4>
+          <Target className="w-3.5 h-3.5 text-green-400" />
+          <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">Problem it Solves</h4>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+        <p className="text-sm text-foreground/90 leading-normal pl-5">
           {insight.problemSolved}
         </p>
       </div>
 
       {/* Architecture Fit */}
-      <div className="space-y-2">
+      <div className="p-3 rounded-lg bg-muted/30 space-y-1.5 border border-border/50">
         <div className="flex items-center gap-2">
-          <Info className="w-4 h-4 text-cyan-400" />
-          <h4 className="font-medium text-sm">Architecture Fit</h4>
+          <Info className="w-3.5 h-3.5 text-cyan-400" />
+          <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">Architecture Fit</h4>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+        <p className="text-sm text-foreground/90 leading-normal pl-5">
           This file is part of the frontend layer, handling UI presentation and user interactions.
         </p>
       </div>
@@ -183,68 +184,111 @@ interface ImportantTabProps {
 }
 
 function ImportantTab({ insight, onLineClick, selectedRange }: ImportantTabProps) {
-  const allItems = [
-    ...insight.keyMethods.map((method) => ({
-      id: `method-${method.name}`,
-      label: method.name,
-      description: method.purpose,
-      startLine: method.lineStart,
-      endLine: method.lineEnd,
-      type: "method" as const,
-    })),
-    ...insight.snippets.map((snippet) => ({
-      id: snippet.id,
-      label: snippet.label,
-      description: snippet.description,
-      startLine: snippet.startLine,
-      endLine: snippet.endLine,
-      type: "snippet" as const,
-    })),
-  ];
-
   return (
-    <div className="p-4 space-y-2">
-      <p className="text-xs text-muted-foreground mb-3">
-        Click to highlight in code viewer
-      </p>
-      {allItems.map((item) => {
-        const isSelected = selectedRange?.startLine === item.startLine && 
-                          selectedRange?.endLine === item.endLine;
-        return (
-          <button
-            key={item.id}
-            onClick={() => onLineClick(item.startLine, item.endLine)}
-            className={cn(
-              "w-full flex items-center gap-2 p-3 rounded-lg text-left transition-all group",
-              isSelected
-                ? "bg-primary/10 ring-1 ring-primary/30"
-                : "bg-muted/50 hover:bg-muted"
-            )}
-          >
-            <Code2 className={cn(
-              "w-4 h-4 flex-shrink-0",
-              isSelected ? "text-primary" : "text-cyan-400"
-            )} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-mono text-xs font-medium truncate">
-                  {item.label}
-                </span>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 flex-shrink-0">
-                  L{item.startLine}-{item.endLine}
-                </Badge>
+    <div className="p-3 space-y-5">
+      {/* Fun Facts */}
+      {insight.funFacts && insight.funFacts.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 px-1">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <h4 className="font-bold text-xs uppercase tracking-widest text-purple-400/80">Important Fun</h4>
+          </div>
+          <div className="grid gap-2">
+            {insight.funFacts.map((fact, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/10 space-y-1">
+                <h5 className="font-semibold text-xs text-purple-300">{fact.title}</h5>
+                <p className="text-xs text-muted-foreground leading-normal">
+                  {fact.content}
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground line-clamp-2">
-                {item.description}
-              </p>
-            </div>
-            <ChevronRight className={cn(
-              "w-4 h-4 flex-shrink-0 transition-colors",
-              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-            )} />
-          </button>
-        );
-      })}
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Methods */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 px-1">
+          <Code2 className="w-4 h-4 text-cyan-400" />
+          <h4 className="font-bold text-xs uppercase tracking-widest text-cyan-400/80">Methods</h4>
+        </div>
+        <div className="grid gap-2">
+          {insight.keyMethods.map((method) => {
+            const isSelected = selectedRange?.startLine === method.lineStart;
+            return (
+              <button
+                key={method.name}
+                onClick={() => onLineClick(method.lineStart, method.lineEnd)}
+                className={cn(
+                  "w-full text-left p-2.5 rounded-lg transition-all group border",
+                  isSelected
+                    ? "bg-cyan-500/10 border-cyan-500/30 ring-1 ring-cyan-500/20"
+                    : "bg-muted/30 border-border/50 hover:bg-muted/50 hover:border-border"
+                )}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-xs font-bold text-cyan-300">
+                    {method.name}()
+                  </span>
+                  <Badge variant="outline" className="text-[10px] px-1 h-4 border-cyan-500/20 text-cyan-400/80">
+                    L{method.lineStart}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-1.5">
+                  {method.purpose}
+                </p>
+                {method.context && (
+                  <div className="text-[10px] text-cyan-400/60 font-medium italic border-l border-cyan-500/20 pl-2 py-0.5">
+                    {method.context}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Snippets */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 px-1">
+          <Target className="w-4 h-4 text-green-400" />
+          <h4 className="font-bold text-xs uppercase tracking-widest text-green-400/80">Snippets</h4>
+        </div>
+        <div className="grid gap-2">
+          {insight.snippets.map((snippet) => {
+            const isSelected = selectedRange?.startLine === snippet.startLine;
+            return (
+              <button
+                key={snippet.id}
+                onClick={() => onLineClick(snippet.startLine, snippet.endLine)}
+                className={cn(
+                  "w-full text-left p-2.5 rounded-lg transition-all group border",
+                  isSelected
+                    ? "bg-green-500/10 border-green-500/30 ring-1 ring-green-500/20"
+                    : "bg-muted/30 border-border/50 hover:bg-muted/50 hover:border-border"
+                )}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-xs text-green-300">
+                    {snippet.label}
+                  </span>
+                  <Badge variant="outline" className="text-[10px] px-1 h-4 border-green-500/20 text-green-400/80">
+                    L{snippet.startLine}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-1.5">
+                  {snippet.description}
+                </p>
+                {snippet.context && (
+                  <div className="text-[10px] text-green-400/60 font-medium italic border-l border-green-500/20 pl-2 py-0.5">
+                    {snippet.context}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -281,7 +325,7 @@ function IssuesTab({ issues, onLineClick }: IssuesTabProps) {
   }
 
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-3 space-y-2">
       {issues.map((issue) => (
         <button
           key={issue.id}
@@ -294,8 +338,8 @@ function IssuesTab({ issues, onLineClick }: IssuesTabProps) {
               <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                 Line {issue.line}
               </Badge>
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className={cn(
                   "text-[10px] px-1.5 py-0",
                   issue.type === "error" && "bg-destructive/20 text-destructive",

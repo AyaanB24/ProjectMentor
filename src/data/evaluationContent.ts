@@ -1109,7 +1109,65 @@ export function LoginForm({ onSubmit }) {
     }
   ],
   backend: [],
-  database: []
+  database: [],
+  devops: []
+};
+
+// DevOps evaluation questions
+export const devopsQuestions: Record<string, EvaluationQuestion[]> = {
+  beginner: [
+    {
+      id: "do-b-1",
+      question: "What is the purpose of the FROM instruction in this Dockerfile?",
+      code: `FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]`,
+      fileName: "Dockerfile",
+      highlightedLines: [1],
+      options: [
+        "It defines where the source code is located",
+        "It specifies the base image for the container",
+        "It exports the application to a server",
+        "It sets the environment variables"
+      ],
+      correctAnswer: 1,
+      explanation: "The FROM instruction initializes a new build stage and sets the Base Image for subsequent instructions. node:18-alpine is a lightweight image that includes Node.js.",
+      codeReference: "FROM node:18-alpine"
+    },
+    {
+      id: "do-b-2",
+      question: "When will this GitHub Action workflow be triggered?",
+      code: `name: CI/CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3`,
+      fileName: "deploy.yml",
+      highlightedLines: [2, 3, 4, 5, 6],
+      options: [
+        "On every commit to any branch",
+        "Only when a pull request is merged",
+        "On pushes and pull requests to the main branch",
+        "Once a week automatically"
+      ],
+      correctAnswer: 2,
+      explanation: "The 'on' section defines triggers. Here, the workflow runs whenever there is a 'push' or a 'pull_request' specifically targeting the 'main' branch.",
+      codeReference: "on: push: branches: [ main ] pull_request: branches: [ main ]"
+    }
+  ],
+  intermediate: [],
+  advanced: []
 };
 
 // Get questions by area and level
@@ -1118,9 +1176,10 @@ export function getQuestions(area: string, level: string): EvaluationQuestion[] 
     frontend: frontendQuestions,
     backend: backendQuestions,
     database: databaseQuestions,
+    devops: devopsQuestions,
     full: { ...frontendQuestions } // Combine all for full
   };
-  
+
   return questionSets[area]?.[level] || frontendQuestions.beginner;
 }
 
@@ -1131,7 +1190,7 @@ export function evaluatePerformance(
 ): LevelResult {
   let correct = 0;
   const wrongTopics: string[] = [];
-  
+
   Object.entries(answers).forEach(([qIndex, answer]) => {
     const q = questions[parseInt(qIndex)];
     if (q && q.correctAnswer === answer) {
@@ -1142,24 +1201,26 @@ export function evaluatePerformance(
       if (q.question.toLowerCase().includes('effect')) wrongTopics.push('Side Effects');
       if (q.question.toLowerCase().includes('route')) wrongTopics.push('Routing');
       if (q.question.toLowerCase().includes('api') || q.question.toLowerCase().includes('fetch')) wrongTopics.push('API Integration');
+      if (q.question.toLowerCase().includes('docker') || q.fileName.toLowerCase().includes('docker')) wrongTopics.push('Containerization');
+      if (q.question.toLowerCase().includes('action') || q.fileName.toLowerCase().includes('yml')) wrongTopics.push('CI/CD Pipelines');
     }
   });
-  
+
   const percentage = (correct / questions.length) * 100;
-  
+
   const strengths = [];
   const weakAreas = [...new Set(wrongTopics)];
-  
+
   if (percentage >= 80) strengths.push('Strong conceptual understanding');
   if (percentage >= 60) strengths.push('Good grasp of fundamentals');
   if (wrongTopics.length === 0) strengths.push('Excellent performance!');
-  
+
   let recommendation;
   if (percentage < 50) {
     recommendation = `We recommend revisiting the Learn section to strengthen your understanding.`;
   } else if (percentage < 80) {
     recommendation = `Good progress! Consider reviewing: ${weakAreas.join(', ')}`;
   }
-  
+
   return { strengths, weakAreas, recommendation };
 }

@@ -1,11 +1,11 @@
-import { Palette, Server, Database, Container } from "lucide-react";
+import { Palette, Server, Database, Container, Layers } from "lucide-react";
 
 // Scoped folder paths per learning area
 export const scopedFolders: Record<string, string[]> = {
   frontend: ["src", "components", "pages", "routes", "styles", "hooks", "contexts"],
   backend: ["controllers", "services", "routes", "middlewares", "api", "auth"],
   database: ["models", "schemas", "migrations", "seeds", "queries"],
-  devops: ["docker", "ci", "k8s", ".github", "scripts", "deploy"],
+  devops: ["docker", "ci", "k8s", ".github", "scripts", "deploy", "dockerfile"],
   architecture: ["src", "api", "models", "config"], // Shows all for architecture
 };
 
@@ -29,6 +29,7 @@ export interface CodeSnippet {
   startLine: number;
   endLine: number;
   code: string;
+  context?: string;
 }
 
 export interface FileIssue {
@@ -48,8 +49,14 @@ export interface FileInsight {
     purpose: string;
     lineStart: number;
     lineEnd: number;
+    context?: string;
   }[];
   snippets: CodeSnippet[];
+  funFacts?: {
+    title: string;
+    content: string;
+    icon?: string;
+  }[];
   issues?: FileIssue[];
 }
 
@@ -303,6 +310,44 @@ export const learningFlows: Record<string, FlowStep[]> = {
       },
     },
   ],
+  devops: [
+    {
+      id: "why-layer",
+      title: "Why DevOps Exists",
+      subtitle: "Automation & Reliability",
+      description: "DevOps bridges the gap between development and operations through automation and better monitoring.",
+      fileId: "devops-1", // Dockerfile
+      narrative: {
+        whatHappens: "Configuration files define how the application is built, packaged, and deployed automatically.",
+        howItConnects: "This layer wraps the entire application (frontend + backend) to ensure it runs the same way everywhere.",
+        whyThisDesign: "Infrastructure as Code (IaC) makes environment setup reproducible and prevents 'it works on my machine' issues.",
+      },
+    },
+    {
+      id: "entry-point",
+      title: "Containerization",
+      subtitle: "Packaging with Docker",
+      description: "Dockerfiles define the environment your application needs to run consistently.",
+      fileId: "devops-1",
+      narrative: {
+        whatHappens: "A Dockerfile specifies the base image, installs dependencies, and copies the source code into a container.",
+        howItConnects: "The resulting image can be deployed to any server or cloud platform that supports Docker.",
+        whyThisDesign: "Containers provide isolation and portablity, ensuring the production environment matches development.",
+      },
+    },
+    {
+      id: "core-flow",
+      title: "CI/CD Pipeline",
+      subtitle: "Automated Workflows",
+      description: "GitHub Actions or similar tools automate testing and deployment.",
+      fileId: "devops-2", // deploy.yml
+      narrative: {
+        whatHappens: "When code is pushed, the pipeline automatically runs tests, builds the project, and deploys it.",
+        howItConnects: "This connects your source code repository directly to your production environments.",
+        whyThisDesign: "Automation reduces human error and allows for faster, more frequent releases.",
+      },
+    },
+  ],
 };
 
 // File insights with method highlighting
@@ -317,6 +362,17 @@ export const fileInsights: Record<string, FileInsight> = {
         purpose: "Main component that renders the navigation bar with conditional auth UI",
         lineStart: 9,
         lineEnd: 18,
+        context: "The Header is the entry point for users to navigate the application. It's built using React functional components and hooks for state management.",
+      },
+    ],
+    funFacts: [
+      {
+        title: "Sticky Navigation",
+        content: "Modern headers often use 'sticky' positioning to stay visible even when the user scrolls down, ensuring navigation is always a click away.",
+      },
+      {
+        title: "Conditional Rendering",
+        content: "We use simple if/else logic in the UI to swap between 'Login' and 'Profile' buttons based on whether the user is logged in.",
       },
     ],
     snippets: [
@@ -329,6 +385,7 @@ export const fileInsights: Record<string, FileInsight> = {
         code: `<header className="bg-white shadow-sm">
   <nav className="max-w-7xl mx-auto px-4">
     <div className="flex justify-between h-16">`,
+        context: "The <nav> element is a semantic HTML tag that tells browsers and screen readers that this section contains primary navigation links.",
       },
       {
         id: "auth-conditional",
@@ -341,6 +398,7 @@ export const fileInsights: Record<string, FileInsight> = {
 ) : (
   <Link to="/login">Sign In</Link>
 )}`,
+        context: "This uses a ternary operator—the '?' and ':'—to quickly decide which button to show. It's the standard way to handle conditional UI in React.",
       },
     ],
     issues: [
@@ -363,6 +421,13 @@ export const fileInsights: Record<string, FileInsight> = {
         purpose: "Renders a styled button with variant support",
         lineStart: 8,
         lineEnd: 13,
+        context: "This component uses 'destruction' to pluck 'variant' and 'children' directly from props—a very clean and modern React pattern.",
+      },
+    ],
+    funFacts: [
+      {
+        title: "Atomic Design",
+        content: "The Button is a classic 'Atom' in design systems. It should be small, single-purpose, and used everywhere to maintain consistency.",
       },
     ],
     snippets: [
@@ -431,12 +496,19 @@ const variants = {
         purpose: "Retrieves all users from the database",
         lineStart: 7,
         lineEnd: 14,
+        context: "This uses 'async/await' to talk to the database without freezing the server. It's like leaving a message and coming back when the data is ready.",
       },
       {
         name: "GET /:id",
         purpose: "Retrieves a single user by their ID",
         lineStart: 16,
         lineEnd: 27,
+      },
+    ],
+    funFacts: [
+      {
+        title: "RESTful URLs",
+        content: "The ':id' in the URL is a placeholder! Express automatically fills it with whatever the user types in that part of the web address.",
       },
     ],
     snippets: [
@@ -546,6 +618,60 @@ const variants = {
       },
     ],
   },
+  "devops-1": { // Dockerfile
+    fileId: "devops-1",
+    whyExists: "Defines a consistent environment for the application to run in any system.",
+    problemSolved: "Eliminates environment-specific bugs and simplifies the deployment process.",
+    keyMethods: [],
+    funFacts: [
+      {
+        title: "Layer Caching",
+        content: "Docker caches each line in your Dockerfile. If you don't change a line, Docker reuses the previous result, making builds much faster!",
+      }
+    ],
+    snippets: [
+      {
+        id: "docker-base",
+        label: "Base Image Selection",
+        description: "Starts the build from a pre-configured environment",
+        startLine: 1,
+        endLine: 1,
+        code: "FROM node:18-alpine",
+        context: "Using '-alpine' versions keeps your container images small, which makes them faster to download and more secure.",
+      },
+      {
+        id: "docker-workdir",
+        label: "Working Directory",
+        description: "Sets the directory where all following commands will run",
+        startLine: 2,
+        endLine: 2,
+        code: "WORKDIR /app",
+      }
+    ],
+  },
+  "devops-2": { // deploy.yml
+    fileId: "devops-2",
+    whyExists: "Automates the process of testing and deploying code changes.",
+    problemSolved: "Reduces manual work and ensures every change is tested before it hits production.",
+    keyMethods: [],
+    funFacts: [
+      {
+        title: "Continuous Delivery",
+        content: "Some teams deploy their code many times per day! Automation is what makes this speed possible.",
+      }
+    ],
+    snippets: [
+      {
+        id: "gh-actions-trigger",
+        label: "Workflow Trigger",
+        description: "Defines when the automation should run",
+        startLine: 3,
+        endLine: 5,
+        code: "on:\n  push:\n    branches: [ main ]",
+        context: "This tells GitHub to start the workflow only when someone pushes changes to the 'main' branch.",
+      }
+    ],
+  },
 };
 
 export const learningAreas = [
@@ -584,5 +710,14 @@ export const learningAreas = [
     description: "Get a complete picture of how all parts work together.",
     progress: 0,
     color: "text-purple-400",
+  },
+  {
+    id: "devops",
+    icon: Layers,
+    title: "DevOps",
+    shortTitle: "CI/CD & Docker",
+    description: "Learn about containerization, automated deployments, and infrastructure.",
+    progress: 0,
+    color: "text-orange-400",
   },
 ];

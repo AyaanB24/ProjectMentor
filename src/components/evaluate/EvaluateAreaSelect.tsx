@@ -8,6 +8,7 @@ const evaluationAreas = [
   { id: "frontend", icon: Palette, title: "Frontend", description: "Test your knowledge of React, routing, and UI" },
   { id: "backend", icon: Server, title: "Backend", description: "Test your knowledge of APIs and server logic" },
   { id: "database", icon: Database, title: "Database", description: "Test your knowledge of models and data" },
+  { id: "devops", icon: Layers, title: "DevOps", description: "Test your knowledge of Docker and CI/CD" },
   { id: "full", icon: Layers, title: "Full Project", description: "Comprehensive test covering all areas" },
 ];
 

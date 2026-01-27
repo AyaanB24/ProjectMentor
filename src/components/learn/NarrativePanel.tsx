@@ -1,11 +1,11 @@
 import { FlowStep } from "@/data/learningContent";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  BookOpen, 
-  Link2, 
-  Sparkles 
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Link2,
+  Sparkles
 } from "lucide-react";
 
 interface NarrativePanelProps {

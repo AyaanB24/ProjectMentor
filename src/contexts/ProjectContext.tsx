@@ -277,6 +277,48 @@ export default App;`,
 }`,
     purpose: "Project configuration file defining dependencies and scripts. Lists all npm packages required for both frontend and backend.",
   },
+  {
+    id: "devops-1",
+    name: "Dockerfile",
+    path: "/Dockerfile",
+    type: "file",
+    category: "other",
+    content: `FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]`,
+    purpose: "Defines the container environment for the application. Sets up Node.js, installs dependencies, and configures the startup command.",
+  },
+  {
+    id: "devops-2",
+    name: "deploy.yml",
+    path: "/.github/workflows/deploy.yml",
+    type: "file",
+    category: "other",
+    content: `name: CI/CD Pipeline
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - run: npm install
+      - run: npm run build
+      - run: npm test`,
+    purpose: "Automated CI/CD workflow that runs tests and builds the project on every push to the main branch.",
+  },
 ];
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
@@ -286,21 +328,21 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
 
   const scanProject = useCallback(async (source: "github" | "zip", url?: string) => {
     setIsScanning(true);
-    
+
     // Simulate scanning
     await new Promise((resolve) => setTimeout(resolve, 2500));
-    
+
     const project: Project = {
       id: "proj_" + Math.random().toString(36).substr(2, 9),
       name: url ? url.split("/").pop() || "My Project" : "Uploaded Project",
       source,
-      techStack: ["React", "Node.js", "Express", "MongoDB"],
-      totalFiles: 12,
+      techStack: ["React", "Node.js", "Express", "MongoDB", "Docker", "GitHub Actions"],
+      totalFiles: 14,
       totalFolders: 5,
       files: mockProjectFiles,
       createdAt: new Date(),
     };
-    
+
     setCurrentProject(project);
     setIsScanning(false);
   }, []);

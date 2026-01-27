@@ -11,8 +11,9 @@ import { getQuestions, evaluatePerformance, advancedTasks, LevelResult } from "@
 
 const areaLabels: Record<string, string> = {
   frontend: "Frontend",
-  backend: "Backend", 
+  backend: "Backend",
   database: "Database",
+  devops: "DevOps",
   full: "Full Project"
 };
 
@@ -23,9 +24,9 @@ export default function Evaluate() {
   const [searchParams] = useSearchParams();
   const { currentProject } = useProject();
   const { isAuthenticated } = useAuth();
-  
+
   const areaParam = searchParams.get("area");
-  
+
   const [step, setStep] = useState<EvaluationStep>("area");
   const [selectedArea, setSelectedArea] = useState<string | null>(areaParam);
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
@@ -65,12 +66,12 @@ export default function Evaluate() {
   const handleQuestionsComplete = (answers: Record<number, number>) => {
     const questions = getQuestions(selectedArea || "frontend", selectedLevel || "beginner");
     const evaluation = evaluatePerformance(answers, questions);
-    
+
     let correct = 0;
     Object.entries(answers).forEach(([qIndex, answer]) => {
       if (questions[parseInt(qIndex)]?.correctAnswer === answer) correct++;
     });
-    
+
     setScore(correct);
     setTotal(questions.length);
     setResult(evaluation);
@@ -80,7 +81,7 @@ export default function Evaluate() {
   const handleAdvancedComplete = (results: { taskId: string; passed: number; total: number }[]) => {
     const totalPassed = results.reduce((sum, r) => sum + r.passed, 0);
     const totalCriteria = results.reduce((sum, r) => sum + r.total, 0);
-    
+
     setScore(totalPassed);
     setTotal(totalCriteria);
     setResult({
