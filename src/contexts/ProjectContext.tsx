@@ -11,11 +11,19 @@ export interface ProjectFile {
   category?: "frontend" | "backend" | "database" | "config" | "other";
 }
 
+export interface TechStack {
+  frontend: string[];
+  backend: string[];
+  database: string[];
+  devops: string[];
+  other: string[];
+}
+
 export interface Project {
   id: string;
   name: string;
   source: "github" | "zip";
-  techStack: string[];
+  techStack: TechStack;
   totalFiles: number;
   totalFolders: number;
   files: ProjectFile[];
@@ -336,7 +344,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       id: "proj_" + Math.random().toString(36).substr(2, 9),
       name: url ? url.split("/").pop() || "My Project" : "Uploaded Project",
       source,
-      techStack: ["React", "Node.js", "Express", "MongoDB", "Docker", "GitHub Actions"],
+      techStack: {
+        frontend: ["React", "Tailwind CSS", "Framer Motion", "Lucide React"],
+        backend: ["Node.js", "Express", "TypeScript"],
+        database: ["MongoDB", "Mongoose"],
+        devops: ["Docker", "GitHub Actions", "Vite"],
+        other: ["ESLint", "PostCSS"]
+      },
       totalFiles: 14,
       totalFolders: 5,
       files: mockProjectFiles,
