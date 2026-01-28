@@ -89,8 +89,8 @@ export default function Landing() {
               variants={itemVariants}
               className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter"
             >
-              Master Any Codebase <br />
-              <span className="text-gradient">With Zero Friction.</span>
+              Master any Codebase,<br />
+              <span className="text-gradient">Effortlessly.</span>
             </motion.h1>
 
             <motion.p

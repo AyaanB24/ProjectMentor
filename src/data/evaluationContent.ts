@@ -1108,9 +1108,146 @@ export function LoginForm({ onSubmit }) {
 }`
     }
   ],
-  backend: [],
-  database: [],
-  devops: []
+  backend: [
+    {
+      id: "be-adv-1",
+      task: "Add error handling and Joi validation to this Express login route.",
+      fileName: "routes/auth.js",
+      initialCode: `const router = require('express').Router();
+const User = require('../models/User');
+
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  
+  if (user.password === password) {
+    res.json({ token: 'mock-token' });
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+});`,
+      editableRegion: { start: 1, end: 15 },
+      hints: [
+        "Include a try/catch block",
+        "Validate request body using a schema",
+        "Check if user exists before accessing properties",
+        "Use bcrypt for password comparison (mental model)",
+        "Handle validation errors with 400 status"
+      ],
+      evaluationCriteria: [
+        "Added try-catch block for error handling",
+        "Implemented request body validation",
+        "Handles missing user correctly (prevents crash)",
+        "Returns appropriate status codes (400, 401, 500)",
+        "Logs errors for debugging"
+      ],
+      sampleSolution: `const router = require('express').Router();
+const User = require('../models/User');
+const Joi = require('joi');
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required()
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    if (user.password === password) {
+      res.json({ token: 'mock-token', user: { id: user.id, email: user.email } });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});`
+    }
+  ],
+  database: [
+    {
+      id: "db-adv-1",
+      task: "Optimize this MongoDB query to use projections and indexing concepts for a large dataset.",
+      fileName: "services/db.js",
+      initialCode: `async function getActiveUsers() {
+  const users = await User.find();
+  return users.filter(u => u.status === 'active');
+}`,
+      editableRegion: { start: 1, end: 5 },
+      hints: [
+        "Filter data at the database level instead of in-memory",
+        "Select only necessary fields using projection",
+        "Add a limit if needed",
+        "Assume 'status' has an index"
+      ],
+      evaluationCriteria: [
+        "Moved filtering to Database query level",
+        "Used projection to limit returned fields",
+        "Improved memory efficiency",
+        "Optimized for large collections"
+      ],
+      sampleSolution: `async function getActiveUsers() {
+  // Filter at DB level and select only name/email
+  return await User.find(
+    { status: 'active' }, 
+    { name: 1, email: 1, _id: 1 }
+  ).lean();
+}`
+    }
+  ],
+  devops: [
+    {
+      id: "do-adv-1",
+      task: "Refactor this Dockerfile to use multi-stage builds to reduce image size.",
+      fileName: "Dockerfile",
+      initialCode: `FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]`,
+      editableRegion: { start: 1, end: 8 },
+      hints: [
+        "Use a build stage and a runner stage",
+        "Only copy the build artifacts to the final stage",
+        "Use a smaller base image (like alpine) for the runner",
+        "Install only production dependencies in final stage"
+      ],
+      evaluationCriteria: [
+        "Used multiple FROM statements",
+        "Reduced final image size",
+        "Separated build tools from runtime",
+        "Improved security by excluding source code from final image"
+      ],
+      sampleSolution: `# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Runner stage
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+RUN npm install --production
+EXPOSE 3000
+CMD ["npm", "run", "start:prod"]`
+    }
+  ]
 };
 
 // DevOps evaluation questions

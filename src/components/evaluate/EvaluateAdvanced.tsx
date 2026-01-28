@@ -30,6 +30,16 @@ export function EvaluateAdvanced({
   const [feedback, setFeedback] = useState<TaskFeedback | null>(null);
   const [results, setResults] = useState<{ taskId: string; passed: number; total: number }[]>([]);
 
+  if (!tasks || tasks.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center space-y-4">
+        <h3 className="text-xl font-semibold">Advanced tasks coming soon for this area!</h3>
+        <p className="text-muted-foreground">We're currently building out more complex coding challenges. Try a different area or level.</p>
+        <Button onClick={onExit}>Try Another Area</Button>
+      </div>
+    );
+  }
+
   const task = tasks[currentTask];
   const totalTasks = tasks.length;
 
@@ -72,7 +82,7 @@ export function EvaluateAdvanced({
     const evaluation = evaluateCode(code);
     setFeedback(evaluation);
     setIsSubmitted(true);
-    
+
     setResults(prev => [...prev, {
       taskId: task.id,
       passed: evaluation.passed.length,
